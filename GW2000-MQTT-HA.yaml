@@ -1,0 +1,1005 @@
+# configuration.yaml
+# MUST BE IN THE mqtt: part of your config!
+
+sensor:
+
+  # Wittboy Ecowit GW2000a Weather Stations via MQTT
+  # Based on firmware 3.2.5
+
+  - name: "Weather Station Raw Data"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unique_id: "gw2000a_raw_data"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.dateutc | default('unknown') }}
+    json_attributes_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data | to_json }}
+    device:
+      identifiers: "gw2000a_weather_station"
+      name: "Wittboy GW2000A Weather Station"
+      model: "GW2000A"
+      manufacturer: "Wittboy"
+
+  # Individual Sensors, grouped under the same device
+  # Indoor Temperature
+  - name: "Indoor Temperature"
+    unique_id: "gw2000a_indoor_temperature"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ((ns.data.tempinf | default(0.0) | float) - 32) * 5 / 9 | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Indoor Humidity
+  - name: "Indoor Humidity"
+    unique_id: "gw2000a_indoor_humidity"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "%"
+    device_class: "humidity"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.humidityin | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Relative Barometric Pressure
+  - name: "Relative Pressure"
+    unique_id: "gw2000a_relative_pressure"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "hPa"
+    device_class: "pressure"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.baromrelin | default(0.0) | float * 33.86389) | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Absolute Barometric Pressure
+  - name: "Absolute Pressure"
+    unique_id: "gw2000a_absolute_pressure"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "hPa"
+    device_class: "pressure"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.baromabsin | default(0.0) | float * 33.86389) | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Outdoor Temperature
+  - name: "Outdoor Temperature"
+    unique_id: "gw2000a_outdoor_temperature"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ((ns.data.tempf | default(0.0) | float) - 32) * 5 / 9 | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Outdoor Humidity
+  - name: "Outdoor Humidity"
+    unique_id: "gw2000a_humidity"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "%"
+    device_class: "humidity"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.humidity | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Vapor Pressure Deficit (VPD)
+  - name: "VPD"
+    unique_id: "gw2000a_vpd"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "hPa"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.vpd | default(0.0) | float * 33.86389) | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Wind Direction
+  - name: "Wind Direction"
+    unique_id: "gw2000a_wind_direction"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "°"
+    icon: mdi:compass
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.winddir | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Wind Speed
+  - name: "Wind Speed"
+    unique_id: "gw2000a_wind_speed"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "m/s"
+    device_class: "wind_speed"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.windspeedmph | default(0.0) | float * 0.44704) | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Wind Gust
+  - name: "Wind Gust"
+    unique_id: "gw2000a_wind_gust"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "m/s"
+    device_class: "wind_speed"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.windgustmph | default(0.0) | float * 0.44704) | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Max Daily Gust
+  - name: "Max Daily Gust"
+    unique_id: "gw2000a_max_daily_gust"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "m/s"
+    device_class: "wind_speed"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.maxdailygust | default(0.0) | float * 0.44704) | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Solar Radiation
+  - name: "Solar Radiation"
+    unique_id: "gw2000a_solar_radiation"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "W/m²"
+    device_class: "illuminance" # Or "power" if you prefer
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.solarradiation | default(0.0) | float }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # UV Index
+  - name: "UV Index"
+    unique_id: "gw2000a_uv_index"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "UV Index"
+    icon: mdi:sunglasses
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.uv | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Rain Rate
+  - name: "Rain Rate"
+    unique_id: "gw2000a_rain_rate"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm/hr"
+    device_class: "precipitation_intensity"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.rainratein | default(0.0) | float * 25.4) | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Event Rain
+  - name: "Event Rain"
+    unique_id: "gw2000a_event_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.eventrainin | default(0.0) | float * 25.4) | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Hourly Rain
+  - name: "Hourly Rain"
+    unique_id: "gw2000a_hourly_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.hourlyrainin | default(0.0) | float * 25.4) | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Daily Rain
+  - name: "Daily Rain"
+    unique_id: "gw2000a_daily_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.dailyrainin | default(0.0) | float * 25.4) | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Weekly Rain
+  - name: "Weekly Rain"
+    unique_id: "gw2000a_weekly_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.weeklyrainin | default(0.0) | float * 25.4) | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Monthly Rain
+  - name: "Monthly Rain"
+    unique_id: "gw2000a_monthly_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.monthlyrainin | default(0.0) | float * 25.4) | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Yearly Rain
+  - name: "Yearly Rain"
+    unique_id: "gw2000a_yearly_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.yearlyrainin | default(0.0) | float * 25.4) | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Piezo Rain Rate
+  - name: "Piezo Rain Rate"
+    unique_id: "gw2000a_piezo_rain_rate"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm/hr"
+    device_class: "precipitation_intensity"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.rrain_piezo | default(0.0) | float | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Piezo Event Rain
+  - name: "Piezo Event Rain"
+    unique_id: "gw2000a_piezo_event_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.erain_piezo | default(0.0) | float | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Piezo Hourly Rain
+  - name: "Piezo Hourly Rain"
+    unique_id: "gw2000a_piezo_hourly_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.hrain_piezo | default(0.0) | float | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Piezo Daily Rain
+  - name: "Piezo Daily Rain"
+    unique_id: "gw2000a_piezo_daily_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.drain_piezo | default(0.0) | float | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Piezo Weekly Rain
+  - name: "Piezo Weekly Rain"
+    unique_id: "gw2000a_piezo_weekly_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.wrain_piezo | default(0.0) | float | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Piezo Monthly Rain
+  - name: "Piezo Monthly Rain"
+    unique_id: "gw2000a_piezo_monthly_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.mrain_piezo | default(0.0) | float | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Piezo Yearly Rain
+  - name: "Piezo Yearly Rain"
+    unique_id: "gw2000a_piezo_yearly_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.yrain_piezo | default(0.0) | float | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # New sensor: Piezo Switch Rain (srain_piezo)
+  - name: "Piezo Switch Rain"
+    unique_id: "gw2000a_piezo_switch_rain"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "mm"
+    device_class: "precipitation"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.srain_piezo | default(0.0) | float | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # WS90 Cap Voltage
+  - name: "WS90 Cap Voltage"
+    unique_id: "gw2000a_ws90_cap_volt"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "V"
+    device_class: "voltage"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.ws90cap_volt | default(0.0) | float | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # New sensor: WS90 Version (ws90_ver)
+  - name: "WS90 Version"
+    unique_id: "gw2000a_ws90_version"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    icon: mdi:numeric
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.ws90_ver | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil Moisture 1
+  - name: "Soil Moisture 1"
+    unique_id: "gw2000a_soil_moisture_1"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilmoisture1 | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil AD 1 (Analog-to-Digital reading)
+  - name: "Soil AD 1"
+    unique_id: "gw2000a_soil_ad_1"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "ADC" # Custom unit
+    icon: mdi:chip
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilad1 | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil Moisture 2
+  - name: "Soil Moisture 2"
+    unique_id: "gw2000a_soil_moisture_2"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "%"
+    device_class: "humidity"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilmoisture2 | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil AD 2
+  - name: "Soil AD 2"
+    unique_id: "gw2000a_soil_ad_2"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "ADC"
+    icon: mdi:chip
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilad2 | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil Moisture 3
+  - name: "Soil Moisture 3"
+    unique_id: "gw2000a_soil_moisture_3"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilmoisture3 | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil AD 3
+  - name: "Soil AD 3"
+    unique_id: "gw2000a_soil_ad_3"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "ADC"
+    icon: mdi:chip
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilad3 | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil Moisture 4
+  - name: "Soil Moisture 4"
+    unique_id: "gw2000a_soil_moisture_4"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilmoisture4 | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil AD 4
+  - name: "Soil AD 4"
+    unique_id: "gw2000a_soil_ad_4"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "ADC"
+    icon: mdi:chip
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilad4 | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil Battery 1
+  - name: "Soil Battery 1"
+    unique_id: "gw2000a_soil_battery_1"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "V"
+    device_class: "voltage"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilbatt1 | default(0.0) | float | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil Battery 2
+  - name: "Soil Battery 2"
+    unique_id: "gw2000a_soil_battery_2"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "V"
+    device_class: "voltage"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilbatt2 | default(0.0) | float | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil Battery 3
+  - name: "Soil Battery 3"
+    unique_id: "gw2000a_soil_battery_3"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "V"
+    device_class: "voltage"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilbatt3 | default(0.0) | float | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Soil Battery 4
+  - name: "Soil Battery 4"
+    unique_id: "gw2000a_soil_battery_4"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "V"
+    device_class: "voltage"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.soilbatt4 | default(0.0) | float | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # WH90 Battery
+  - name: "WH90 Battery"
+    unique_id: "gw2000a_wh90_battery"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "V"
+    device_class: "voltage"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.wh90batt | default(0.0) | float | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Runtime (uptime)
+  - name: "Runtime"
+    unique_id: "gw2000a_runtime"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "seconds"
+    icon: mdi:timer-outline
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.runtime | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Heap Memory
+  - name: "Heap Memory"
+    unique_id: "gw2000a_heap_memory"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "bytes"
+    icon: mdi:memory
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.heap | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # DNS Error Count
+  - name: "DNS Error Count"
+    unique_id: "gw2000a_dns_error_count"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    icon: mdi:dns-off
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.dns_err_cnt | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Station Type (as a text sensor)
+  - name: "Station Type"
+    unique_id: "gw2000a_station_type"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.stationtype | default('unknown') }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Frequency (as a numeric sensor)
+  - name: "Frequency"
+    unique_id: "gw2000a_frequency"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "MHz"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.freq | default('0M') | replace('M', '') | float }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Model (as a text sensor)
+  - name: "Model"
+    unique_id: "gw2000a_model"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.model | default('unknown') }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Interval (as a numeric sensor)
+  - name: "Interval"
+    unique_id: "gw2000a_interval"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    unit_of_measurement: "seconds"
+    icon: mdi:timer-sync-outline
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.interval | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # New sensor: CDN Flag (cdnflg)
+  - name: "CDN Flag"
+    unique_id: "gw2000a_cdn_flag"
+    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    icon: mdi:flag
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.cdnflg | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+##########################################
+#                SWITCHES                #
+##########################################
+
+switch:
+  - unique_id: bijkeuken_dakraam_0001
+    name: "Bijkeuken Dakraam"
+    state_topic: "unipi/bbg/bijkeuken/dakraam/contact" #here we check the sensor state, not the switch, to determine open or closed!
+    state_on: "ON"
+    state_off: "OFF"
+    #value_template: {"value": {{ value_json.value }}}
+    command_topic: "unipi1/bijkeuken/dakraam/set"
+    availability_topic: "unipi/bbg/bijkeuken/dakraam/contact/available"
+    payload_available: "online"
+    payload_not_available: "offline"
+    payload_on: '{"state": "on", "circuit": "1_02", "dev": "output", "duration": 25}'
+    payload_off: '{"state": "on", "circuit": "1_01", "dev": "output", "duration": 35}'
+    qos: 0
+    icon: mdi:window-closed
+    #state: if (binary_sensor.bijkeuken_dakraam_contact==='ON') return 'on' ; else return 'off';
+    retain: true
+
+  - unique_id: bel_0001
+    name: "Bel"
+    state_topic: "unipi1/bgg/hal/bel"
+    command_topic: "unipi1/bgg/hal/bel/set"
+    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
+    #availability_topic: "homeassistant/bgg/hal/bel/available"
+    #payload_available: "online"
+    #payload_not_available: "offline"
+    payload_on: '{"circuit": "2_02", "dev": "relay", "repeat": "2", "state": "pulse"}'
+    payload_off: '{"circuit": "2_02", "dev": "relay", "state": "off"}'
+    qos: 0
+    icon: mdi:bell-ring
+    #retain: true
+
+  - unique_id: achterlicht_buiten_switch_0001
+    name: "Achter Buitenlicht Switch"
+    state_topic: "unipi1/bgg/achter/buitenlichtschakelaar"
+    command_topic: "unipi1/bgg/achter/buitenlichtschakelaar"
+    payload_on: "ON"
+    payload_off: "OFF"
+    availability_topic: "unipi1/bgg/achter/buitenlichtschakelaar/available"
+    payload_available: "online"
+    payload_not_available: "offline"
+    qos: 0
+    retain: true
+
+  - unique_id: wcd_vliering_buiten_0001
+    name: "WCD Kast Vliering - relay1"
+    state_topic: "unipi2/veranda/relay1"
+    command_topic: "unipi2/veranda/relay1/set"
+    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
+    #availability_topic: "homeassistant/bgg/hal/bel/available"
+    #payload_available: "online"
+    #payload_not_available: "offline"
+    payload_on: '{"circuit": "UART_2_2_01", "dev": "relay", "state": "on"}'
+    payload_off: '{"circuit": "UART_2_2_01", "dev": "relay", "state": "off"}'
+    qos: 0
+    icon: mdi:power-socket-eu
+    retain: true
+
+  # Relay vliering serre voor WCD buiten paal
+  - unique_id: wcd_paal_buiten_0001
+    name: "WCD Paal Buiten - relay2"
+    state_topic: "unipi2/veranda/relay2"
+    command_topic: "unipi2/veranda/relay2/set"
+    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
+    #availability_topic: "homeassistant/bgg/hal/bel/available"
+    #payload_available: "online"
+    #payload_not_available: "offline"
+    payload_on: '{"circuit": "UART_2_2_02", "dev": "relay", "state": "on"}'
+    payload_off: '{"circuit": "UART_2_2_02", "dev": "relay", "state": "off"}'
+    qos: 0
+    icon: mdi:power-socket-eu
+    retain: true
+
+  # Relay Smart Grid aansturing Warmtepomp 1
+  - unique_id: Warmtepomp_smartgrid_1_S10S
+    name: "Warmtepomp Smart Grid 1 - S10S "
+    state_topic: "unipi1/warmtepomp/smartgrid/relay3_1"
+    command_topic: "unipi1/warmtepomp/smartgrid/relay3_1/set"
+    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
+    #availability_topic: "homeassistant/bgg/hal/bel/available"
+    #payload_available: "online"
+    #payload_not_available: "offline"
+    payload_on: '{"circuit": "3_01", "dev": "relay", "state": "on"}'
+    payload_off: '{"circuit": "3_01", "dev": "relay", "state": "off"}'
+    qos: 0
+    icon: mdi:power-socket-eu
+    retain: true
+
+  # Relay Smart Grid aansturing Warmtepomp 2
+  - unique_id: Warmtepomp_smartgrid_2_S11S
+    name: "Warmtepomp Smart Grid 2 - S11S "
+    state_topic: "unipi1/warmtepomp/smartgrid/relay3_2"
+    command_topic: "unipi1/warmtepomp/smartgrid/relay3_2/set"
+    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
+    #availability_topic: "homeassistant/bgg/hal/bel/available"
+    #payload_available: "online"
+    #payload_not_available: "offline"
+    payload_on: '{"circuit": "3_02", "dev": "relay", "state": "on"}'
+    payload_off: '{"circuit": "3_02", "dev": "relay", "state": "off"}'
+    qos: 0
+    icon: mdi:power-socket-eu
+    retain: true
+
+##########################################
+#                SWITCHES                #
+##########################################
+
+valve:
+  # Irrigatie Sproeiers schakelingen
+
+  - unique_id: irrigatie_zone_1
+    name: "Irrigatie - Zone 1"
+    state_topic: "unipi2/buiten/irrigatie_zone_1"
+    command_topic: "unipi2/buiten/irrigatie_zone_1/set"
+    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
+    reports_position: false
+    payload_open: '{"circuit": "1_01", "dev": "relay", "state": "on"}'
+    payload_close: '{"circuit": "1_01", "dev": "relay", "state": "off"}'
+    state_open: "on"
+    state_closed: "off"
+    # payload_on: '{"circuit": "1_01", "dev": "relay", "state": "on"}' config when this was a switch, not a valve
+    # payload_off: '{"circuit": "1_01", "dev": "relay", "state": "off"}'
+    qos: 0
+    icon: mdi:valve
+    retain: true
+
+  - unique_id: irrigatie_zone_2
+    name: "Irrigatie - Zone 2"
+    state_topic: "unipi2/buiten/irrigatie_zone_2"
+    command_topic: "unipi2/buiten/irrigatie_zone_2/set"
+    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
+    payload_open: '{"circuit": "1_02", "dev": "relay", "state": "on"}'
+    payload_close: '{"circuit": "1_02", "dev": "relay", "state": "off"}'
+    reports_position: false
+    state_open: "on"
+    state_closed: "off"
+    qos: 0
+    icon: mdi:valve
+    retain: true
+
+  - unique_id: irrigatie_zone_3
+    name: "Irrigatie - Zone 3"
+    state_topic: "unipi2/buiten/irrigatie_zone_3"
+    command_topic: "unipi2/buiten/irrigatie_zone_3/set"
+    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
+    payload_open: '{"circuit": "1_03", "dev": "relay", "state": "on"}'
+    payload_close: '{"circuit": "1_03", "dev": "relay", "state": "off"}'
+    reports_position: false
+    state_open: "on"
+    state_closed: "off"
+    qos: 0
+    icon: mdi:valve
+    retain: true
+
+  - unique_id: irrigatie_zone_4
+    name: "Irrigatie - Zone 4"
+    state_topic: "unipi2/buiten/irrigatie_zone_4"
+    command_topic: "unipi2/buiten/irrigatie_zone_4/set"
+    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
+    payload_open: '{"circuit": "1_04", "dev": "relay", "state": "on"}'
+    payload_close: '{"circuit": "1_04", "dev": "relay", "state": "off"}'
+    reports_position: false
+    state_open: "on"
+    state_closed: "off"
+    qos: 0
+    icon: mdi:valve
+    retain: true
