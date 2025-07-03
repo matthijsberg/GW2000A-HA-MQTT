@@ -231,7 +231,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ ns.data.uv | default(0) | int }}
+      {{ ns.data.uv | int }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -247,7 +247,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ (ns.data.rainratein | default(0.0) | float * 25.4) | round(1) }}
+      {{ (ns.data.rainratein | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -263,7 +263,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ (ns.data.eventrainin | default(0.0) | float * 25.4) | round(1) }}
+      {{ (ns.data.eventrainin | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -279,7 +279,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ (ns.data.hourlyrainin | default(0.0) | float * 25.4) | round(1) }}
+      {{ (ns.data.hourlyrainin | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -295,7 +295,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ (ns.data.dailyrainin | default(0.0) | float * 25.4) | round(1) }}
+      {{ (ns.data.dailyrainin | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -311,7 +311,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ (ns.data.weeklyrainin | default(0.0) | float * 25.4) | round(1) }}
+      {{ (ns.data.weeklyrainin | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -327,7 +327,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ (ns.data.monthlyrainin | default(0.0) | float * 25.4) | round(1) }}
+      {{ (ns.data.monthlyrainin | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -343,7 +343,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ (ns.data.yearlyrainin | default(0.0) | float * 25.4) | round(1) }}
+      {{ (ns.data.yearlyrainin | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -359,7 +359,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ ns.data.rrain_piezo | default(0.0) | float | round(1) }}
+      {{ (ns.data.rrain_piezo | default(0.0) | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -375,7 +375,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ ns.data.erain_piezo | default(0.0) | float | round(1) }}
+      {{ (ns.data.erain_piezo | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -391,7 +391,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ ns.data.hrain_piezo | default(0.0) | float | round(1) }}
+      {{ (ns.data.hrain_piezo | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -407,7 +407,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ ns.data.drain_piezo | default(0.0) | float | round(1) }}
+      {{ (ns.data.drain_piezo | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -423,7 +423,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ ns.data.wrain_piezo | default(0.0) | float | round(1) }}
+      {{ (ns.data.wrain_piezo | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -439,7 +439,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ ns.data.mrain_piezo | default(0.0) | float | round(1) }}
+      {{ (ns.data.mrain_piezo | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -455,7 +455,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ ns.data.yrain_piezo | default(0.0) | float | round(1) }}
+      {{ (ns.data.yrain_piezo | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -471,7 +471,7 @@ sensor:
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ ns.data.srain_piezo | default(0.0) | float | round(1) }}
+      {{ (ns.data.srain_piezo | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
@@ -831,175 +831,4 @@ sensor:
       {{ ns.data.cdnflg | default(0) | int }}
     device:
       identifiers: "gw2000a_weather_station"
-
-##########################################
-#                SWITCHES                #
-##########################################
-
-switch:
-  - unique_id: bijkeuken_dakraam_0001
-    name: "Bijkeuken Dakraam"
-    state_topic: "unipi/bbg/bijkeuken/dakraam/contact" #here we check the sensor state, not the switch, to determine open or closed!
-    state_on: "ON"
-    state_off: "OFF"
-    #value_template: {"value": {{ value_json.value }}}
-    command_topic: "unipi1/bijkeuken/dakraam/set"
-    availability_topic: "unipi/bbg/bijkeuken/dakraam/contact/available"
-    payload_available: "online"
-    payload_not_available: "offline"
-    payload_on: '{"state": "on", "circuit": "1_02", "dev": "output", "duration": 25}'
-    payload_off: '{"state": "on", "circuit": "1_01", "dev": "output", "duration": 35}'
-    qos: 0
-    icon: mdi:window-closed
-    #state: if (binary_sensor.bijkeuken_dakraam_contact==='ON') return 'on' ; else return 'off';
-    retain: true
-
-  - unique_id: bel_0001
-    name: "Bel"
-    state_topic: "unipi1/bgg/hal/bel"
-    command_topic: "unipi1/bgg/hal/bel/set"
-    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
-    #availability_topic: "homeassistant/bgg/hal/bel/available"
-    #payload_available: "online"
-    #payload_not_available: "offline"
-    payload_on: '{"circuit": "2_02", "dev": "relay", "repeat": "2", "state": "pulse"}'
-    payload_off: '{"circuit": "2_02", "dev": "relay", "state": "off"}'
-    qos: 0
-    icon: mdi:bell-ring
-    #retain: true
-
-  - unique_id: achterlicht_buiten_switch_0001
-    name: "Achter Buitenlicht Switch"
-    state_topic: "unipi1/bgg/achter/buitenlichtschakelaar"
-    command_topic: "unipi1/bgg/achter/buitenlichtschakelaar"
-    payload_on: "ON"
-    payload_off: "OFF"
-    availability_topic: "unipi1/bgg/achter/buitenlichtschakelaar/available"
-    payload_available: "online"
-    payload_not_available: "offline"
-    qos: 0
-    retain: true
-
-  - unique_id: wcd_vliering_buiten_0001
-    name: "WCD Kast Vliering - relay1"
-    state_topic: "unipi2/veranda/relay1"
-    command_topic: "unipi2/veranda/relay1/set"
-    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
-    #availability_topic: "homeassistant/bgg/hal/bel/available"
-    #payload_available: "online"
-    #payload_not_available: "offline"
-    payload_on: '{"circuit": "UART_2_2_01", "dev": "relay", "state": "on"}'
-    payload_off: '{"circuit": "UART_2_2_01", "dev": "relay", "state": "off"}'
-    qos: 0
-    icon: mdi:power-socket-eu
-    retain: true
-
-  # Relay vliering serre voor WCD buiten paal
-  - unique_id: wcd_paal_buiten_0001
-    name: "WCD Paal Buiten - relay2"
-    state_topic: "unipi2/veranda/relay2"
-    command_topic: "unipi2/veranda/relay2/set"
-    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
-    #availability_topic: "homeassistant/bgg/hal/bel/available"
-    #payload_available: "online"
-    #payload_not_available: "offline"
-    payload_on: '{"circuit": "UART_2_2_02", "dev": "relay", "state": "on"}'
-    payload_off: '{"circuit": "UART_2_2_02", "dev": "relay", "state": "off"}'
-    qos: 0
-    icon: mdi:power-socket-eu
-    retain: true
-
-  # Relay Smart Grid aansturing Warmtepomp 1
-  - unique_id: Warmtepomp_smartgrid_1_S10S
-    name: "Warmtepomp Smart Grid 1 - S10S "
-    state_topic: "unipi1/warmtepomp/smartgrid/relay3_1"
-    command_topic: "unipi1/warmtepomp/smartgrid/relay3_1/set"
-    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
-    #availability_topic: "homeassistant/bgg/hal/bel/available"
-    #payload_available: "online"
-    #payload_not_available: "offline"
-    payload_on: '{"circuit": "3_01", "dev": "relay", "state": "on"}'
-    payload_off: '{"circuit": "3_01", "dev": "relay", "state": "off"}'
-    qos: 0
-    icon: mdi:power-socket-eu
-    retain: true
-
-  # Relay Smart Grid aansturing Warmtepomp 2
-  - unique_id: Warmtepomp_smartgrid_2_S11S
-    name: "Warmtepomp Smart Grid 2 - S11S "
-    state_topic: "unipi1/warmtepomp/smartgrid/relay3_2"
-    command_topic: "unipi1/warmtepomp/smartgrid/relay3_2/set"
-    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
-    #availability_topic: "homeassistant/bgg/hal/bel/available"
-    #payload_available: "online"
-    #payload_not_available: "offline"
-    payload_on: '{"circuit": "3_02", "dev": "relay", "state": "on"}'
-    payload_off: '{"circuit": "3_02", "dev": "relay", "state": "off"}'
-    qos: 0
-    icon: mdi:power-socket-eu
-    retain: true
-
-##########################################
-#                SWITCHES                #
-##########################################
-
-valve:
-  # Irrigatie Sproeiers schakelingen
-
-  - unique_id: irrigatie_zone_1
-    name: "Irrigatie - Zone 1"
-    state_topic: "unipi2/buiten/irrigatie_zone_1"
-    command_topic: "unipi2/buiten/irrigatie_zone_1/set"
-    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
-    reports_position: false
-    payload_open: '{"circuit": "1_01", "dev": "relay", "state": "on"}'
-    payload_close: '{"circuit": "1_01", "dev": "relay", "state": "off"}'
-    state_open: "on"
-    state_closed: "off"
-    # payload_on: '{"circuit": "1_01", "dev": "relay", "state": "on"}' config when this was a switch, not a valve
-    # payload_off: '{"circuit": "1_01", "dev": "relay", "state": "off"}'
-    qos: 0
-    icon: mdi:valve
-    retain: true
-
-  - unique_id: irrigatie_zone_2
-    name: "Irrigatie - Zone 2"
-    state_topic: "unipi2/buiten/irrigatie_zone_2"
-    command_topic: "unipi2/buiten/irrigatie_zone_2/set"
-    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
-    payload_open: '{"circuit": "1_02", "dev": "relay", "state": "on"}'
-    payload_close: '{"circuit": "1_02", "dev": "relay", "state": "off"}'
-    reports_position: false
-    state_open: "on"
-    state_closed: "off"
-    qos: 0
-    icon: mdi:valve
-    retain: true
-
-  - unique_id: irrigatie_zone_3
-    name: "Irrigatie - Zone 3"
-    state_topic: "unipi2/buiten/irrigatie_zone_3"
-    command_topic: "unipi2/buiten/irrigatie_zone_3/set"
-    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
-    payload_open: '{"circuit": "1_03", "dev": "relay", "state": "on"}'
-    payload_close: '{"circuit": "1_03", "dev": "relay", "state": "off"}'
-    reports_position: false
-    state_open: "on"
-    state_closed: "off"
-    qos: 0
-    icon: mdi:valve
-    retain: true
-
-  - unique_id: irrigatie_zone_4
-    name: "Irrigatie - Zone 4"
-    state_topic: "unipi2/buiten/irrigatie_zone_4"
-    command_topic: "unipi2/buiten/irrigatie_zone_4/set"
-    optimistic: true #device is available in HA, as we do notpublish status in MQTT here! Need fix?
-    payload_open: '{"circuit": "1_04", "dev": "relay", "state": "on"}'
-    payload_close: '{"circuit": "1_04", "dev": "relay", "state": "off"}'
-    reports_position: false
-    state_open: "on"
-    state_closed: "off"
-    qos: 0
-    icon: mdi:valve
-    retain: true
+      
