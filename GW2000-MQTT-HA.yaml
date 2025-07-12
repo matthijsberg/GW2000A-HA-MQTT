@@ -1,13 +1,42 @@
 # configuration.yaml
 # MUST BE IN THE mqtt: part of your config!
 
+binary_sensor:
+
+  ###################################################
+  #                 WHITTBOY GS2000A                #
+  #                  binary sensors                 #
+  ###################################################
+
+  # Rain Status (Piezo)
+  - name: "Rain Status (Piezo)"
+    unique_id: "gw2000a_piezo_rain_status"
+    state_topic: "ecowitt/E05A1B2117DF"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {# If srain_piezo is greater than 0, consider it "on" (raining), otherwise "off" #}
+      {% if ns.data.srain_piezo | default(0) | float > 0 %}
+        ON
+      {% else %}
+        OFF
+      {% endif %}
+    device:
+      identifiers: "gw2000a_weather_station"
+
 sensor:
 
+  ###################################################
+  #                 WHITTBOY GS2000A                #
+  #                      sensors                    #
+  ###################################################
   # Wittboy Ecowit GW2000a Weather Stations via MQTT
-  # Based on firmware 3.2.5
+  # Based on firmward 3.2.5
 
   - name: "Weather Station Raw Data"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unique_id: "gw2000a_raw_data"
     value_template: >-
       {% set ns = namespace(data={}) %}
@@ -24,14 +53,15 @@ sensor:
     device:
       identifiers: "gw2000a_weather_station"
       name: "Wittboy GW2000A Weather Station"
-      model: "GW2000A"
+      model: "GW2000A / GS90"
       manufacturer: "Wittboy"
+      sw_version: "see sensors"
 
   # Individual Sensors, grouped under the same device
   # Indoor Temperature
   - name: "Indoor Temperature"
     unique_id: "gw2000a_indoor_temperature"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "°C"
     device_class: "temperature"
     state_class: "measurement"
@@ -47,7 +77,7 @@ sensor:
   # Indoor Humidity
   - name: "Indoor Humidity"
     unique_id: "gw2000a_indoor_humidity"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "%"
     device_class: "humidity"
     state_class: "measurement"
@@ -63,7 +93,7 @@ sensor:
   # Relative Barometric Pressure
   - name: "Relative Pressure"
     unique_id: "gw2000a_relative_pressure"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "hPa"
     device_class: "pressure"
     state_class: "measurement"
@@ -79,7 +109,7 @@ sensor:
   # Absolute Barometric Pressure
   - name: "Absolute Pressure"
     unique_id: "gw2000a_absolute_pressure"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "hPa"
     device_class: "pressure"
     state_class: "measurement"
@@ -95,7 +125,7 @@ sensor:
   # Outdoor Temperature
   - name: "Outdoor Temperature"
     unique_id: "gw2000a_outdoor_temperature"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "°C"
     device_class: "temperature"
     state_class: "measurement"
@@ -111,7 +141,7 @@ sensor:
   # Outdoor Humidity
   - name: "Outdoor Humidity"
     unique_id: "gw2000a_humidity"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "%"
     device_class: "humidity"
     state_class: "measurement"
@@ -127,22 +157,23 @@ sensor:
   # Vapor Pressure Deficit (VPD)
   - name: "VPD"
     unique_id: "gw2000a_vpd"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
-    unit_of_measurement: "hPa"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "kPa"
     state_class: "measurement"
+    device_class: "pressure"
     value_template: >-
       {% set ns = namespace(data={}) %}
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
-      {{ (ns.data.vpd | default(0.0) | float * 33.86389) | round(2) }}
+      {{ (ns.data.vpd | default(0.0) | float * 3.386389) | round(3) }}
     device:
       identifiers: "gw2000a_weather_station"
 
   # Wind Direction
   - name: "Wind Direction"
     unique_id: "gw2000a_wind_direction"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "°"
     icon: mdi:compass
     state_class: "measurement"
@@ -158,7 +189,7 @@ sensor:
   # Wind Speed
   - name: "Wind Speed"
     unique_id: "gw2000a_wind_speed"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "m/s"
     device_class: "wind_speed"
     state_class: "measurement"
@@ -174,7 +205,7 @@ sensor:
   # Wind Gust
   - name: "Wind Gust"
     unique_id: "gw2000a_wind_gust"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "m/s"
     device_class: "wind_speed"
     state_class: "measurement"
@@ -190,7 +221,7 @@ sensor:
   # Max Daily Gust
   - name: "Max Daily Gust"
     unique_id: "gw2000a_max_daily_gust"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "m/s"
     device_class: "wind_speed"
     state_class: "measurement"
@@ -206,9 +237,9 @@ sensor:
   # Solar Radiation
   - name: "Solar Radiation"
     unique_id: "gw2000a_solar_radiation"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "W/m²"
-    device_class: "illuminance" # Or "power" if you prefer
+    device_class: "IRRADIANCE"
     state_class: "measurement"
     value_template: >-
       {% set ns = namespace(data={}) %}
@@ -222,7 +253,7 @@ sensor:
   # UV Index
   - name: "UV Index"
     unique_id: "gw2000a_uv_index"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "UV Index"
     icon: mdi:sunglasses
     state_class: "measurement"
@@ -238,8 +269,8 @@ sensor:
   # Rain Rate
   - name: "Rain Rate"
     unique_id: "gw2000a_rain_rate"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
-    unit_of_measurement: "mm/hr"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "mm/h"
     device_class: "precipitation_intensity"
     state_class: "measurement"
     value_template: >-
@@ -252,9 +283,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Event Rain
-  - name: "Event Rain"
+  - name: "Rain Event"
     unique_id: "gw2000a_event_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "mm"
     device_class: "precipitation"
     state_class: "total_increasing"
@@ -268,11 +299,11 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Hourly Rain
-  - name: "Hourly Rain"
+  - name: "Rain Hourly"
     unique_id: "gw2000a_hourly_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
-    unit_of_measurement: "mm"
-    device_class: "precipitation"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "mm/h"
+    device_class: "precipitation_intensity"
     state_class: "total_increasing"
     value_template: >-
       {% set ns = namespace(data={}) %}
@@ -284,11 +315,11 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Daily Rain
-  - name: "Daily Rain"
+  - name: "Rain Daily"
     unique_id: "gw2000a_daily_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
-    unit_of_measurement: "mm"
-    device_class: "precipitation"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "mm/d"
+    device_class: "precipitation_intensity"
     state_class: "total_increasing"
     value_template: >-
       {% set ns = namespace(data={}) %}
@@ -300,9 +331,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Weekly Rain
-  - name: "Weekly Rain"
+  - name: "Rain Weekly"
     unique_id: "gw2000a_weekly_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "mm"
     device_class: "precipitation"
     state_class: "total_increasing"
@@ -316,9 +347,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Monthly Rain
-  - name: "Monthly Rain"
+  - name: "Rain Monthly"
     unique_id: "gw2000a_monthly_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "mm"
     device_class: "precipitation"
     state_class: "total_increasing"
@@ -332,9 +363,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Yearly Rain
-  - name: "Yearly Rain"
+  - name: "Rain Yearly"
     unique_id: "gw2000a_yearly_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "mm"
     device_class: "precipitation"
     state_class: "total_increasing"
@@ -348,10 +379,10 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Piezo Rain Rate
-  - name: "Piezo Rain Rate"
+  - name: "Rain Rate (Piezo)"
     unique_id: "gw2000a_piezo_rain_rate"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
-    unit_of_measurement: "mm/hr"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "mm/h"
     device_class: "precipitation_intensity"
     state_class: "measurement"
     value_template: >-
@@ -364,9 +395,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Piezo Event Rain
-  - name: "Piezo Event Rain"
+  - name: "Rain Event (Piezo)"
     unique_id: "gw2000a_piezo_event_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "mm"
     device_class: "precipitation"
     state_class: "total_increasing"
@@ -380,11 +411,11 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Piezo Hourly Rain
-  - name: "Piezo Hourly Rain"
+  - name: "Rain Hourly (Piezo)"
     unique_id: "gw2000a_piezo_hourly_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
-    unit_of_measurement: "mm"
-    device_class: "precipitation"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "mm/h"
+    device_class: "precipitation_intensity"
     state_class: "total_increasing"
     value_template: >-
       {% set ns = namespace(data={}) %}
@@ -396,11 +427,11 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Piezo Daily Rain
-  - name: "Piezo Daily Rain"
+  - name: "Rain Daily (Piezo)"
     unique_id: "gw2000a_piezo_daily_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
-    unit_of_measurement: "mm"
-    device_class: "precipitation"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "mm/d"
+    device_class: "precipitation_intensity"
     state_class: "total_increasing"
     value_template: >-
       {% set ns = namespace(data={}) %}
@@ -412,9 +443,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Piezo Weekly Rain
-  - name: "Piezo Weekly Rain"
+  - name: "Rain Weekly (Piezo)"
     unique_id: "gw2000a_piezo_weekly_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "mm"
     device_class: "precipitation"
     state_class: "total_increasing"
@@ -428,9 +459,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Piezo Monthly Rain
-  - name: "Piezo Monthly Rain"
+  - name: "Rain Monthly (Piezo)"
     unique_id: "gw2000a_piezo_monthly_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "mm"
     device_class: "precipitation"
     state_class: "total_increasing"
@@ -444,9 +475,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Piezo Yearly Rain
-  - name: "Piezo Yearly Rain"
+  - name: "Rain Yearly (Piezo)"
     unique_id: "gw2000a_piezo_yearly_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "mm"
     device_class: "precipitation"
     state_class: "total_increasing"
@@ -459,29 +490,14 @@ sensor:
     device:
       identifiers: "gw2000a_weather_station"
 
-  # New sensor: Piezo Switch Rain (srain_piezo)
-  - name: "Piezo Switch Rain"
-    unique_id: "gw2000a_piezo_switch_rain"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
-    unit_of_measurement: "mm"
-    device_class: "precipitation"
-    state_class: "total_increasing"
-    value_template: >-
-      {% set ns = namespace(data={}) %}
-      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
-        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
-      {% endfor %}
-      {{ (ns.data.srain_piezo | float * 25.4) | round(1) }}
-    device:
-      identifiers: "gw2000a_weather_station"
-
   # WS90 Cap Voltage
-  - name: "WS90 Cap Voltage"
+  - name: "WS90 Capacitor Voltage"
     unique_id: "gw2000a_ws90_cap_volt"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "V"
     device_class: "voltage"
     state_class: "measurement"
+    icon: mdi:current-dc
     value_template: >-
       {% set ns = namespace(data={}) %}
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
@@ -494,7 +510,7 @@ sensor:
   # New sensor: WS90 Version (ws90_ver)
   - name: "WS90 Version"
     unique_id: "gw2000a_ws90_version"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     icon: mdi:numeric
     state_class: "measurement"
     value_template: >-
@@ -507,9 +523,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil Moisture 1
-  - name: "Soil Moisture 1"
+  - name: "Soil Sensor 1 Moisture"
     unique_id: "gw2000a_soil_moisture_1"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "%"
     icon: mdi:water-percent
     state_class: "measurement"
@@ -523,9 +539,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil AD 1 (Analog-to-Digital reading)
-  - name: "Soil AD 1"
+  - name: "Soil Sensor 1 AD"
     unique_id: "gw2000a_soil_ad_1"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "ADC" # Custom unit
     icon: mdi:chip
     state_class: "measurement"
@@ -539,9 +555,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil Moisture 2
-  - name: "Soil Moisture 2"
+  - name: "Soil Sensor 2 Moisture"
     unique_id: "gw2000a_soil_moisture_2"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "%"
     device_class: "humidity"
     state_class: "measurement"
@@ -555,9 +571,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil AD 2
-  - name: "Soil AD 2"
+  - name: "Soil Sensor 2AD"
     unique_id: "gw2000a_soil_ad_2"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "ADC"
     icon: mdi:chip
     state_class: "measurement"
@@ -571,9 +587,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil Moisture 3
-  - name: "Soil Moisture 3"
+  - name: "Soil Sensor 3 Moisture"
     unique_id: "gw2000a_soil_moisture_3"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "%"
     icon: mdi:water-percent
     state_class: "measurement"
@@ -587,9 +603,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil AD 3
-  - name: "Soil AD 3"
+  - name: "Soil Sensor 3 AD"
     unique_id: "gw2000a_soil_ad_3"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "ADC"
     icon: mdi:chip
     state_class: "measurement"
@@ -603,9 +619,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil Moisture 4
-  - name: "Soil Moisture 4"
+  - name: "Soil Sensor 4 Moisture"
     unique_id: "gw2000a_soil_moisture_4"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "%"
     icon: mdi:water-percent
     state_class: "measurement"
@@ -619,9 +635,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil AD 4
-  - name: "Soil AD 4"
+  - name: "Soil Sensor 4 AD"
     unique_id: "gw2000a_soil_ad_4"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "ADC"
     icon: mdi:chip
     state_class: "measurement"
@@ -635,9 +651,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil Battery 1
-  - name: "Soil Battery 1"
+  - name: "Soil Sensor 1 Battery"
     unique_id: "gw2000a_soil_battery_1"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "V"
     device_class: "voltage"
     state_class: "measurement"
@@ -651,9 +667,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil Battery 2
-  - name: "Soil Battery 2"
+  - name: "Soil Sensor 2 Battery"
     unique_id: "gw2000a_soil_battery_2"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "V"
     device_class: "voltage"
     state_class: "measurement"
@@ -667,9 +683,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil Battery 3
-  - name: "Soil Battery 3"
+  - name: "Soil Sensor 3 Battery"
     unique_id: "gw2000a_soil_battery_3"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "V"
     device_class: "voltage"
     state_class: "measurement"
@@ -683,9 +699,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Soil Battery 4
-  - name: "Soil Battery 4"
+  - name: "Soil Sensor 4 Battery"
     unique_id: "gw2000a_soil_battery_4"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "V"
     device_class: "voltage"
     state_class: "measurement"
@@ -698,12 +714,13 @@ sensor:
     device:
       identifiers: "gw2000a_weather_station"
 
-  # WH90 Battery
-  - name: "WH90 Battery"
+  # WS90 Battery
+  - name: "WS90 Battery"
     unique_id: "gw2000a_wh90_battery"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "V"
     device_class: "voltage"
+    icon: mdi:battery
     state_class: "measurement"
     value_template: >-
       {% set ns = namespace(data={}) %}
@@ -715,9 +732,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Runtime (uptime)
-  - name: "Runtime"
+  - name: "WS90 Runtime"
     unique_id: "gw2000a_runtime"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "seconds"
     icon: mdi:timer-outline
     state_class: "measurement"
@@ -731,9 +748,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Heap Memory
-  - name: "Heap Memory"
+  - name: "GW2000A Heap Memory"
     unique_id: "gw2000a_heap_memory"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "bytes"
     icon: mdi:memory
     state_class: "measurement"
@@ -747,10 +764,10 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # DNS Error Count
-  - name: "DNS Error Count"
+  - name: "GW2000A DNS Error Count"
     unique_id: "gw2000a_dns_error_count"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
-    icon: mdi:dns-off
+    state_topic: "ecowitt/E05A1B2117DF"
+    icon: mdi:alert-circle
     state_class: "total_increasing"
     value_template: >-
       {% set ns = namespace(data={}) %}
@@ -762,9 +779,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Station Type (as a text sensor)
-  - name: "Station Type"
+  - name: "GW2000A Station Type"
     unique_id: "gw2000a_station_type"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     value_template: >-
       {% set ns = namespace(data={}) %}
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
@@ -775,9 +792,10 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Frequency (as a numeric sensor)
-  - name: "Frequency"
+  - name: "GW2000A Frequency"
     unique_id: "gw2000a_frequency"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
+    icon: mdi:sine-wave
     unit_of_measurement: "MHz"
     value_template: >-
       {% set ns = namespace(data={}) %}
@@ -789,22 +807,23 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # Model (as a text sensor)
-  - name: "Model"
+  - name: "GW2000A Model"
     unique_id: "gw2000a_model"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     value_template: >-
       {% set ns = namespace(data={}) %}
       {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
       {{ ns.data.model | default('unknown') }}
+    icon: mdi:thermometer-high
     device:
       identifiers: "gw2000a_weather_station"
 
   # Interval (as a numeric sensor)
-  - name: "Interval"
+  - name: "GW2000A Interval"
     unique_id: "gw2000a_interval"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     unit_of_measurement: "seconds"
     icon: mdi:timer-sync-outline
     state_class: "measurement"
@@ -818,9 +837,9 @@ sensor:
       identifiers: "gw2000a_weather_station"
 
   # New sensor: CDN Flag (cdnflg)
-  - name: "CDN Flag"
+  - name: "GW2000A CDN Flag"
     unique_id: "gw2000a_cdn_flag"
-    state_topic: "ecowitt/E05A1B2117DF" # <<< REPLACE WITH YOUR ACTUAL MQTT TOPIC
+    state_topic: "ecowitt/E05A1B2117DF"
     icon: mdi:flag
     state_class: "measurement"
     value_template: >-
@@ -831,4 +850,70 @@ sensor:
       {{ ns.data.cdnflg | default(0) | int }}
     device:
       identifiers: "gw2000a_weather_station"
-      
+
+  # Dew Point (Indoor)
+  - name: "Indoor Dew Point"
+    unique_id: "gw2000a_indoor_dew_point"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+
+      {% set temp_f = ns.data.tempinf | default(0.0) | float %}
+      {% set humidity_in = ns.data.humidityin | default(0) | int %}
+
+      {# Convert Fahrenheit to Celsius for dew point calculation #}
+      {% set temp_c = ((temp_f - 32) * 5 / 9) %}
+
+      {# Constants for Magnus formula approximation #}
+      {% set A = 17.27 %}
+      {% set B = 237.7 %}
+
+      {# Calculate gamma #}
+      {% set gamma = (A * temp_c) / (B + temp_c) + log(humidity_in / 100) %}
+
+      {# Calculate dew point #}
+      {% set dew_point_c = (B * gamma) / (A - gamma) %}
+
+      {{ dew_point_c | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Dew Point (Outdoor)
+  - name: "Outdoor Dew Point"
+    unique_id: "gw2000a_outdoor_dew_point"
+    state_topic: "ecowitt/E05A1B2117DF" #
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+
+      {% set temp_f_outdoor = ns.data.tempf | default(0.0) | float %}
+      {% set humidity_outdoor = ns.data.humidity | default(0) | int %}
+
+      {# Convert Fahrenheit to Celsius for dew point calculation #}
+      {% set temp_c_outdoor = ((temp_f_outdoor - 32) * 5 / 9) %}
+
+      {# Constants for Magnus formula approximation #}
+      {% set A = 17.27 %}
+      {% set B = 237.7 %}
+
+      {# Calculate gamma #}
+      {% set gamma = (A * temp_c_outdoor) / (B + temp_c_outdoor) + log(humidity_outdoor / 100) %}
+
+      {# Calculate dew point #}
+      {% set dew_point_c = (B * gamma) / (A - gamma) %}
+
+      {{ dew_point_c | round(2) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
