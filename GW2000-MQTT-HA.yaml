@@ -186,6 +186,22 @@ sensor:
     device:
       identifiers: "gw2000a_weather_station"
 
+  # Wind Direction AVG 10 Min.
+  - name: "Wind Direction Avg 10 min."
+    unique_id: "gw2000a_wind_direction_avg10m"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "°"
+    icon: mdi:compass
+    state_class: "measurement"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ ns.data.winddir_avg10m | default(0) | int }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
   # Wind Speed
   - name: "Wind Speed"
     unique_id: "gw2000a_wind_speed"
@@ -330,6 +346,22 @@ sensor:
     device:
       identifiers: "gw2000a_weather_station"
 
+  # Last 24h Rain
+  - name: "Rain Last 24h"
+    unique_id: "gw2000a_24h_rain"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "mm/d"
+    device_class: "precipitation_intensity"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.last24hrainin | float * 25.4) | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
   # Weekly Rain
   - name: "Rain Weekly"
     unique_id: "gw2000a_weekly_rain"
@@ -439,6 +471,22 @@ sensor:
         {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
       {% endfor %}
       {{ (ns.data.drain_piezo | float * 25.4) | round(1) }}
+    device:
+      identifiers: "gw2000a_weather_station"
+
+  # Piezo 24h Rain
+  - name: "Rain Last 24h (Piezo)"
+    unique_id: "gw2000a_piezo_24h_rain"
+    state_topic: "ecowitt/E05A1B2117DF"
+    unit_of_measurement: "mm/d"
+    device_class: "precipitation_intensity"
+    state_class: "total_increasing"
+    value_template: >-
+      {% set ns = namespace(data={}) %}
+      {% for item in value | string | regex_findall('([^&=]+)=([^&]*)') %}
+        {% set ns.data = ns.data | combine({item[0]: item[1]}) %}
+      {% endfor %}
+      {{ (ns.data.last24hrain_piezo | float * 25.4) | round(1) }}
     device:
       identifiers: "gw2000a_weather_station"
 
